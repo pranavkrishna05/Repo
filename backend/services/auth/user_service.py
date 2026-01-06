@@ -47,6 +47,14 @@ class UserService:
         self.logger.info("Session created for user: %s with token: %s", user.email, token)
         return Session(id=session_id, user_id=user.id, token=token, expires_at=expires_at)
 
+    def update_profile(self, user_id: int, first_name: Optional[str], last_name: Optional[str], preferences: Optional[str]) -> None:
+        user_data = self.user_repository.get_user_by_id(user_id)
+        if user_data:
+            self.user_repository.update_user_profile(user_id, first_name, last_name, preferences)
+            self.logger.info("Profile updated for user: %s", user_data['email'])
+        else:
+            self.logger.warning("User profile update failed. User not found with id: %d", user_id)
+
     def _hash_password(self, password: str) -> str:
         return sha256(password.encode()).hexdigest()
 
