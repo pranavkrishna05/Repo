@@ -4,6 +4,9 @@ CREATE TABLE users (
     password TEXT NOT NULL,
     login_attempts INTEGER NOT NULL DEFAULT 0,
     is_locked BOOLEAN NOT NULL DEFAULT 0,
+    first_name TEXT,
+    last_name TEXT,
+    preferences TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
