@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, Dict
 import logging
 
 from backend.models.product import Product
@@ -36,3 +36,8 @@ class ProductService:
         category_id = self.category_repository.create_category(name)
         self.logger.info("Category created with name: %s", name)
         return category_id
+
+    def search_products(self, search_term: str, page: int, page_size: int) -> List[Dict[str, str]]:
+        results = self.product_repository.search_products(search_term, page, page_size)
+        self.logger.info("Products searched for term: %s", search_term)
+        return results
