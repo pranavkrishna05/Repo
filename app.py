@@ -116,19 +116,4 @@ def update_profile():
 
 @app.route('/add-product', methods=['POST'])
 def add_product():
-    data = request.get_json()
-    name = data.get('name')
-    price = data.get('price')
-    description = data.get('description')
-    category_id = data.get('category_id')
-
-    if not name or price is None or not description:
-        return jsonify({"error": "Name, price and description are required"}), 400
-
-    product_repository = ProductRepository(g.db)
-    category_repository = CategoryRepository(g.db)
-    product_service = ProductService(product_repository, category_repository)
-
-    try:
-        product_id = product_service.add_product(name, price, description, category_id)
-    except ValueError
+    data = request
