@@ -159,6 +159,21 @@ def update_product():
 
     return jsonify({"message": "Product updated successfully"}), 200
 
+@app.route('/delete-product', methods=['POST'])
+def delete_product():
+    data = request.get_json()
+    product_id = data.get('product_id')
+    
+    if product_id is None:
+        return jsonify({"error": "Product ID is required"}), 400
+
+    product_repository = ProductRepository(g.db)
+    product_service = ProductService(product_repository, None)
+
+    product_service.delete_product(product_id)
+
+    return jsonify({"message": "Product deleted successfully"}), 200
+
 @app.route('/')
 def index():
     return "Welcome to User Account Management"
