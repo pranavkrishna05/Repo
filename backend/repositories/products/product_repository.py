@@ -29,3 +29,8 @@ class ProductRepository:
         WHERE id = :product_id"""
         self.db_session.execute(query, {"name": name, "price": price, "description": description, "category_id": category_id, "product_id": product_id})
         self.db_session.commit()
+
+    def delete_product(self, product_id: int) -> None:
+        query = "DELETE FROM products WHERE id = :product_id"
+        self.db_session.execute(query, {"product_id": product_id})
+        self.db_session.commit()
