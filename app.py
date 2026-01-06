@@ -134,6 +134,31 @@ def add_product():
 
     return jsonify({"message": "Product added successfully", "product_id": product_id}), 201
 
+@app.route('/update-product', methods=['POST'])
+def update_product():
+    data = request.get_json()
+    product_id = data.get('product_id')
+    name = data.get('name')
+    price = data.get('price')
+    description = data.get('description')
+    category_id = data.get('category_id')
+
+    if product_id is None:
+        return jsonify({"error": "Product ID is required"}), 400
+    if price is not None and not isinstance(price, (int, float)):
+        return jsonify({"error": "Price must be a numeric value"}), 400
+
+    product_repository = ProductRepository(g.db)
+    category_repository = CategoryRepository(g.db)
+    product_service = ProductService(product_repository, category_repository)
+
+    try:
+        product_service.update_product(product_id, name, price, description, category_id)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    return jsonify({"message": "Product updated successfully"}), 200
+
 @app.route('/')
 def index():
     return "Welcome to User Account Management"
