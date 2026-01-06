@@ -23,8 +23,14 @@ class ProductService:
         return product_id
 
     def update_product(self, product_id: int, name: Optional[str], price: Optional[float], description: Optional[str], category_id: Optional[int]) -> None:
+        if price is not None and not isinstance(price, (int, float)):
+            raise ValueError("Price must be a numeric value")
         self.product_repository.update_product(product_id, name, price, description, category_id)
         self.logger.info("Product updated with id: %s", product_id)
+
+    def delete_product(self, product_id: int) -> None:
+        self.product_repository.delete_product(product_id)
+        self.logger.info("Product deleted with id: %s", product_id)
 
     def add_category(self, name: str) -> int:
         category_id = self.category_repository.create_category(name)
