@@ -6,9 +6,11 @@ from backend.repositories.auth.session_repository import SessionRepository
 from backend.repositories.auth.password_reset_repository import PasswordResetRepository
 from backend.repositories.products.product_repository import ProductRepository
 from backend.repositories.products.category_repository import CategoryRepository
+from backend.repositories.carts.shopping_cart_repository import ShoppingCartRepository
 from backend.services.auth.user_service import UserService
 from backend.services.auth.password_reset_service import PasswordResetService
 from backend.services.products.product_service import ProductService
+from backend.services.carts.shopping_cart_service import ShoppingCartService
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -190,54 +192,4 @@ def search_products():
     results = product_service.search_products(search_term, page, page_size)
     return jsonify(results), 200
 
-@app.route('/add-category', methods=['POST'])
-def add_category():
-    data = request.get_json()
-    name = data.get('name')
-    parent_id = data.get('parent_id')
-
-    if not name:
-        return jsonify({"error": "Category name is required"}), 400
-
-    category_repository = CategoryRepository(g.db)
-    category_service = ProductService(None, category_repository)
-
-    category_id = category_service.add_category(name, parent_id)
-    return jsonify({"message": "Category added successfully", "category_id": category_id}), 201
-
-@app.route('/update-category', methods=['POST'])
-def update_category():
-    data = request.get_json()
-    category_id = data.get('category_id')
-    name = data.get('name')
-    parent_id = data.get('parent_id')
-
-    if category_id is None:
-        return jsonify({"error": "Category ID is required"}), 400
-
-    category_repository = CategoryRepository(g.db)
-    category_service = ProductService(None, category_repository)
-
-    category_service.update_category(category_id, name, parent_id)
-    return jsonify({"message": "Category updated successfully"}), 200
-
-@app.route('/delete-category', methods=['POST'])
-def delete_category():
-    data = request.get_json()
-    category_id = data.get('category_id')
-    
-    if category_id is None:
-        return jsonify({"error": "Category ID is required"}), 400
-
-    category_repository = CategoryRepository(g.db)
-    category_service = ProductService(None, category_repository)
-
-    category_service.delete_category(category_id)
-    return jsonify({"message": "Category deleted successfully"}), 200
-
-@app.route('/')
-def index():
-    return "Welcome to User Account Management"
-
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/add-category', methods
