@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, Dict
 
 class ProductRepository:
     def __init__(self, db_session):
@@ -34,3 +34,12 @@ class ProductRepository:
         query = "DELETE FROM products WHERE id = :product_id"
         self.db_session.execute(query, {"product_id": product_id})
         self.db_session.commit()
+
+    def search_products(self, search_term: str, page: int, page_size: int) -> List[Dict[str, str]]:
+        offset = (page - 1) * page_size
+        query = """
+        SELECT * FROM products 
+        WHERE name LIKE :term OR description LIKE :term 
+        LIMIT :limit OFFSET :offset"""
+        results = self.db_session.execute(query, {"term": f"%{search_term}%", "limit": page_size, "offset": offset}).fetchall()
+        return [dict(row) for row in results]
