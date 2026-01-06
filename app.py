@@ -174,6 +174,22 @@ def delete_product():
 
     return jsonify({"message": "Product deleted successfully"}), 200
 
+@app.route('/search-products', methods=['GET'])
+def search_products():
+    search_term = request.args.get('q')
+    page = request.args.get('page', default=1, type=int)
+    page_size = request.args.get('page_size', default=10, type=int)
+
+    if not search_term:
+        return jsonify({"error": "Search term is required"}), 400
+
+    product_repository = ProductRepository(g.db)
+    category_repository = CategoryRepository(g.db)
+    product_service = ProductService(product_repository, category_repository)
+
+    results = product_service.search_products(search_term, page, page_size)
+    return jsonify(results), 200
+
 @app.route('/')
 def index():
     return "Welcome to User Account Management"
