@@ -3,7 +3,9 @@ from flask import Flask, request, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
 from backend.repositories.auth.user_repository import UserRepository
 from backend.repositories.auth.session_repository import SessionRepository
+from backend.repositories.auth.password_reset_repository import PasswordResetRepository
 from backend.services.auth.user_service import UserService
+from backend.services.auth.password_reset_service import PasswordResetService
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -30,7 +32,7 @@ def register():
         return jsonify({"error": "Email and password are required"}), 400
     
     user_repository = UserRepository(g.db)
-    user_service = UserService(user_repository, None)  # SessionRepository not needed for registration
+    user_service = UserService(user_repository, None)
     user_id = user_service.register_user(email, password)
 
     return jsonify({"user_id": user_id}), 201
@@ -52,8 +54,43 @@ def login():
         return jsonify({"error": "Invalid email or password"}), 401
     
     session = user_service.create_session(user)
-    
+
     return jsonify({"token": session.token, "expires_at": session.expires_at.isoformat()}), 200
+
+@app.route('/request-password-reset', methods=['POST'])
+def request_password_reset():
+    data = request.get_json()
+    email = data.get('email')
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    user_repository = UserRepository(g.db)
+    password_reset_repository = PasswordResetRepository(g.db)
+    password_reset_service = PasswordResetService(password_reset_repository, user_repository)
+
+    token = password_reset_service.request_password_reset(email)
+    if not token:
+        return jsonify({"error": "Password reset request failed"}), 400
+
+    return jsonify({"message": "Password reset requested", "token": token}), 200
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    token = data.get('token')
+    new_password = data.get('password')
+    if not token or not new_password:
+        return jsonify({"error": "Token and new password are required"}), 400
+
+    user_repository = UserRepository(g.db)
+    password_reset_repository = PasswordResetRepository(g.db)
+    password_reset_service = PasswordResetService(password_reset_repository, user_repository)
+
+    success = password_reset_service.reset_password(token, new_password)
+    if not success:
+        return jsonify({"error": "Password reset failed"}), 400
+
+    return jsonify({"message": "Password reset successful"}), 200
 
 @app.route('/')
 def index():
