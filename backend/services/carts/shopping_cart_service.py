@@ -36,3 +36,15 @@ class ShoppingCartService:
         if cart:
             self.shopping_cart_repository.update_product_quantity(cart['id'], product_id, quantity)
             self.logger.info("Updated product %s quantity to %s in cart %s", product_id, quantity, cart['id'])
+
+    def save_cart(self, user_id: int) -> None:
+        cart = self.get_or_create_cart(user_id)
+        self.logger.info("Saved cart %s for user %s", cart.id, user_id)
+
+    def retrieve_cart(self, user_id: int) -> ShoppingCart:
+        cart = self.shopping_cart_repository.get_cart_by_user_id(user_id)
+        if cart:
+            self.logger.info("Retrieved cart %s for user %s", cart['id'], user_id)
+            return ShoppingCart(**cart)
+        else:
+            raise ValueError("No cart found for the user")
