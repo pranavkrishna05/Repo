@@ -92,6 +92,23 @@ def reset_password():
 
     return jsonify({"message": "Password reset successful"}), 200
 
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    preferences = data.get('preferences')
+
+    if user_id is None:
+        return jsonify({"error": "User ID is required"}), 400
+
+    user_repository = UserRepository(g.db)
+    user_service = UserService(user_repository, None)
+    user_service.update_profile(user_id, first_name, last_name, preferences)
+
+    return jsonify({"message": "Profile updated successfully"}), 200
+
 @app.route('/')
 def index():
     return "Welcome to User Account Management"
