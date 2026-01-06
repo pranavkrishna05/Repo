@@ -15,7 +15,7 @@ class UserRepository:
         return dict(result) if result else None
 
     def create_user(self, email: str, password: str) -> int:
-        query = "INSERT INTO users (email, password, created_at, updated_at) VALUES (:email, :password, datetime('now'), datetime('now'))"
+        query = "INSERT INTO users (email, password, login_attempts, is_locked, created_at, updated_at) VALUES (:email, :password, 0, 0, datetime('now'), datetime('now'))"
         result = self.db_session.execute(query, {"email": email, "password": password})
         self.db_session.commit()
         return result.lastrowid
@@ -23,4 +23,14 @@ class UserRepository:
     def update_user_password(self, user_id: int, new_password: str) -> None:
         query = "UPDATE users SET password = :new_password, updated_at = datetime('now') WHERE id = :user_id"
         self.db_session.execute(query, {"new_password": new_password, "user_id": user_id})
+        self.db_session.commit()
+
+    def update_user_login_attempts(self, user_id: int, login_attempts: int) -> None:
+        query = "UPDATE users SET login_attempts = :login_attempts, updated_at = datetime('now') WHERE id = :user_id"
+        self.db_session.execute(query, {"login_attempts": login_attempts, "user_id": user_id})
+        self.db_session.commit()
+
+    def lock_user_account(self, user_id: int) -> None:
+        query = "UPDATE users SET is_locked = 1, updated_at = datetime('now') WHERE id = :user_id"
+        self.db_session.execute(query, {"user_id": user_id})
         self.db_session.commit()
