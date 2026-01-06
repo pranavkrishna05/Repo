@@ -9,6 +9,11 @@ class ShoppingCartRepository:
         result = self.db_session.execute(query, {"user_id": user_id}).fetchone()
         return dict(result) if result else None
 
+    def get_cart_by_cart_id(self, cart_id: int) -> Optional[dict]:
+        query = "SELECT * FROM shopping_carts WHERE id = :cart_id"
+        result = self.db_session.execute(query, {"cart_id": cart_id}).fetchone()
+        return dict(result) if result else None
+
     def create_cart(self, user_id: int, product_ids: List[int]) -> int:
         query = """
         INSERT INTO shopping_carts (user_id, product_ids, created_at, updated_at) 
@@ -38,8 +43,3 @@ class ShoppingCartRepository:
                 WHERE id = :cart_id"""
                 self.db_session.execute(query, {"product_ids": updated_product_ids, "cart_id": cart_id})
                 self.db_session.commit()
-
-    def get_cart_by_cart_id(self, cart_id: int) -> Optional[dict]:
-        query = "SELECT * FROM shopping_carts WHERE id = :cart_id"
-        result = self.db_session.execute(query, {"cart_id": cart_id}).fetchone()
-        return dict(result) if result else None
