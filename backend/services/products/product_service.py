@@ -32,10 +32,18 @@ class ProductService:
         self.product_repository.delete_product(product_id)
         self.logger.info("Product deleted with id: %s", product_id)
 
-    def add_category(self, name: str) -> int:
-        category_id = self.category_repository.create_category(name)
+    def add_category(self, name: str, parent_id: Optional[int] = None) -> int:
+        category_id = self.category_repository.create_category(name, parent_id)
         self.logger.info("Category created with name: %s", name)
         return category_id
+
+    def update_category(self, category_id: int, name: Optional[str], parent_id: Optional[int]) -> None:
+        self.category_repository.update_category(category_id, name, parent_id)
+        self.logger.info("Category updated with id: %s", category_id)
+
+    def delete_category(self, category_id: int) -> None:
+        self.category_repository.delete_category(category_id)
+        self.logger.info("Category deleted with id: %s", category_id)
 
     def search_products(self, search_term: str, page: int, page_size: int) -> List[Dict[str, str]]:
         results = self.product_repository.search_products(search_term, page, page_size)
