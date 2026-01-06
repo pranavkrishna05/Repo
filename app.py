@@ -4,8 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from backend.repositories.auth.user_repository import UserRepository
 from backend.repositories.auth.session_repository import SessionRepository
 from backend.repositories.auth.password_reset_repository import PasswordResetRepository
+from backend.repositories.products.product_repository import ProductRepository
+from backend.repositories.products.category_repository import CategoryRepository
 from backend.services.auth.user_service import UserService
 from backend.services.auth.password_reset_service import PasswordResetService
+from backend.services.products.product_service import ProductService
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -108,6 +111,28 @@ def update_profile():
     user_service.update_profile(user_id, first_name, last_name, preferences)
 
     return jsonify({"message": "Profile updated successfully"}), 200
+
+@app.route('/add-product', methods=['POST'])
+def add_product():
+    data = request.get_json()
+    name = data.get('name')
+    price = data.get('price')
+    description = data.get('description')
+    category_id = data.get('category_id')
+
+    if not name or price is None or not description:
+        return jsonify({"error": "Name, price and description are required"}), 400
+
+    product_repository = ProductRepository(g.db)
+    category_repository = CategoryRepository(g.db)
+    product_service = ProductService(product_repository, category_repository)
+
+    try:
+        product_id = product_service.add_product(name, price, description, category_id)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    return jsonify({"message": "Product added successfully", "product_id": product_id}), 201
 
 @app.route('/')
 def index():
