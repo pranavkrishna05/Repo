@@ -15,7 +15,7 @@ class UserRepository:
         return dict(result) if result else None
 
     def create_user(self, email: str, password: str) -> int:
-        query = "INSERT INTO users (email, password, login_attempts, is_locked, created_at, updated_at) VALUES (:email, :password, 0, 0, datetime('now'), datetime('now'))"
+        query = "INSERT INTO users (email, password, login_attempts, is_locked, created_at, updated_at, first_name, last_name, preferences) VALUES (:email, :password, 0, 0, datetime('now'), datetime('now'), NULL, NULL, NULL)"
         result = self.db_session.execute(query, {"email": email, "password": password})
         self.db_session.commit()
         return result.lastrowid
@@ -23,6 +23,15 @@ class UserRepository:
     def update_user_password(self, user_id: int, new_password: str) -> None:
         query = "UPDATE users SET password = :new_password, updated_at = datetime('now') WHERE id = :user_id"
         self.db_session.execute(query, {"new_password": new_password, "user_id": user_id})
+        self.db_session.commit()
+
+    def update_user_profile(self, user_id: int, first_name: Optional[str], last_name: Optional[str], preferences: Optional[str]) -> None:
+        query = """
+        UPDATE users 
+        SET first_name = :first_name, last_name = :last_name, preferences = :preferences, updated_at = datetime('now') 
+        WHERE id = :user_id
+        """
+        self.db_session.execute(query, {"first_name": first_name, "last_name": last_name, "preferences": preferences, "user_id": user_id})
         self.db_session.commit()
 
     def update_user_login_attempts(self, user_id: int, login_attempts: int) -> None:
