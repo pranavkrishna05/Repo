@@ -1,1 +1,0 @@
-commerce/backend/tests/catalog/README.md

@@ -1,1 +1,0 @@
-commerce/backend/integrations/checkout/README.md

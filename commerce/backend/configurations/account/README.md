@@ -1,1 +1,0 @@
-commerce/backend/configurations/account/README.md
