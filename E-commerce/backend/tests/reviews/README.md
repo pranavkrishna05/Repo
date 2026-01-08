@@ -1,1 +1,0 @@
-E-commerce/backend/tests/reviews/README.md

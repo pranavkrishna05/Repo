@@ -1,1 +1,0 @@
-E-commerce/backend/tests/customer_support/README.md

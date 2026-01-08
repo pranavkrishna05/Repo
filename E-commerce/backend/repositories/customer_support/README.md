@@ -1,1 +1,0 @@
-E-commerce/backend/repositories/customer_support/README.md
